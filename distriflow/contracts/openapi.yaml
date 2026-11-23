@@ -1,0 +1,7 @@
+openapi: 3.1.0
+info: { title: DistriFlow API, version: 0.1.0 }
+paths:
+  /api/v1/pickup-tasks:
+    get: { summary: Danh sách nhiệm vụ theo shipper được xác thực, responses: { '200': { description: OK } } }
+  /api/v1/pickup-tasks/{id}/scan:
+    post: { summary: Quét kiện trong phiên bàn giao, parameters: [{ name: Idempotency-Key, in: header, required: true, schema: { type: string } }], responses: { '200': { description: OK }, '409': { description: Trùng quét hoặc lệch phiên } } }
