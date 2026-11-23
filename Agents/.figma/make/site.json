@@ -1,0 +1,10 @@
+{
+  "description": "Quản lý kho, đơn hàng và giao nhận trên một nền tảng dành cho quản trị viên, nhà cung cấp, đại lý và shipper, giúp theo dõi toàn bộ quy trình phân phối.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}

@@ -1,0 +1,151 @@
+openapi: 3.1.0
+info:
+  title: DistriFlow API - Draft Contract
+  version: 0.1.0-draft
+  description: >-
+    Contract kha nhap de 3 agent thao luan; chua duoc chot hoac trien khai.
+    Backend FastAPI /openapi.json sau nay la contract chinh thuc.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+paths:
+  /auth/me:
+    get:
+      tags: [Auth]
+      summary: Nguoi dang dang nhap va roles
+      operationId: getCurrentUser
+      responses:
+        '200':
+          description: Authenticated user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentUser'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /inventory/balances:
+    get:
+      tags: [Inventory]
+      summary: Tra cuu ton theo scope owner va role
+      operationId: listInventoryBalances
+      parameters:
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: page_size
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Inventory list
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total, page, page_size]
+                properties:
+                  items:
+                    type: array
+                    items: { $ref: '#/components/schemas/InventoryBalance' }
+                  total: { type: integer }
+                  page: { type: integer }
+                  page_size: { type: integer }
+  /handover-sessions/{id}/shipper-confirm:
+    post:
+      tags: [Handover]
+      summary: Xac nhan shipper (chi chot khi du 2 ben)
+      operationId: shipperConfirm
+      parameters:
+        - $ref: '#/components/parameters/HandoverId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmRequest' }
+      responses:
+        '200':
+          description: Xac nhan da duoc ghi nhan; co the dang cho kho
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfirmResponse' }
+        '409':
+          $ref: '#/components/responses/Conflict'
+  /handover-sessions/{id}/warehouse-confirm:
+    post:
+      tags: [Handover]
+      summary: Xac nhan kho (chi chot khi du 2 ben)
+      operationId: warehouseConfirm
+      parameters:
+        - $ref: '#/components/parameters/HandoverId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmRequest' }
+      responses:
+        '200':
+          description: Xac nhan da duoc ghi nhan; co the dang cho shipper
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfirmResponse' }
+        '409':
+          $ref: '#/components/responses/Conflict'
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }
+  parameters:
+    HandoverId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Unauthorized: { description: Chua dang nhap }
+    Conflict: { description: Phien / trang thai khong hop le hoac stale version }
+  schemas:
+    CurrentUser:
+      type: object
+      required: [id, roles, organization_ids]
+      properties:
+        id: { type: string, format: uuid }
+        roles:
+          type: array
+          items:
+            type: string
+            enum: [WAREHOUSE_ADMIN, DISPATCH_MANAGER, RETAILER_OWNER, SUPPLIER, SHIPPER]
+        organization_ids:
+          type: array
+          items: { type: string, format: uuid }
+    InventoryBalance:
+      type: object
+      required: [owner_id, sku_id, on_hand, reserved, other_unavailable, available]
+      properties:
+        owner_id: { type: string, format: uuid }
+        sku_id: { type: string, format: uuid }
+        on_hand: { type: number, minimum: 0 }
+        reserved: { type: number, minimum: 0 }
+        other_unavailable: { type: number, minimum: 0 }
+        available: { type: number, minimum: 0 }
+    ConfirmRequest:
+      type: object
+      required: [version]
+      properties:
+        version: { type: integer, minimum: 1 }
+    ConfirmResponse:
+      type: object
+      required: [status, handover_session_id, version]
+      properties:
+        status:
+          type: string
+          enum: [pending_confirmations, handed_over]
+        handover_session_id: { type: string, format: uuid }
+        version: { type: integer }
+        receipt_id: { type: [string, 'null'], format: uuid }

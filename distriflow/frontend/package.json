@@ -1,0 +1,9 @@
+{
+  "name": "distriflow-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": { "dev": "vite", "build": "vue-tsc -b && vite build", "type-check": "vue-tsc -b", "test:unit": "vitest run", "lint": "eslint ." },
+  "dependencies": { "@vitejs/plugin-vue": "^5.2.3", "lucide-vue-next": "^0.468.0", "pinia": "^2.2.6", "vue": "^3.5.13", "vue-router": "^4.5.0" },
+  "devDependencies": { "@types/node": "^22.10.2", "@vue/tsconfig": "^0.5.1", "eslint": "^9.16.0", "typescript": "~5.6.3", "vite": "^6.0.5", "vitest": "^2.1.8", "vue-tsc": "^2.2.0" }
+}
