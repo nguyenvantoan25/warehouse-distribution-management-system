@@ -1,0 +1,12 @@
+.env
+*.db
+__pycache__/
+.pytest_cache/
+node_modules/
+.tools/
+accounts.local.json
+backups/
+.runtime/
+test-results/
+playwright-report/
+dist/

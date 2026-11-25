@@ -1,0 +1,26 @@
+.login-shell{background:radial-gradient(ellipse at 60% 10%,#e7efff,transparent 60%),#f8fafc;font-family:'Be Vietnam Pro',sans-serif}
+.login-shell .card{padding:36px;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 12px 40px #0f172a08;max-width:420px}
+.login-shell .df-logo{margin-bottom:32px}
+.login-shell h1{font-size:24px;font-weight:700;letter-spacing:-.03em;margin:0 0 8px;color:#0f172a}
+.login-shell form>p:not(.error){font-size:12px;color:#94a3b8;margin:0 0 28px;line-height:1.6}
+.login-shell label{font-size:11px;font-weight:600;color:#64748b;margin-top:18px}
+.login-shell input{font-family:inherit;font-size:13px;border-radius:8px;border:1px solid #e2e8f0;height:42px;margin-top:7px;padding:0 12px;outline:0}
+.login-shell input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px #dbeafe}
+.login-shell button{font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;font-size:12px;background:linear-gradient(90deg,#2563eb,#4f46e5);border-radius:8px;min-height:42px;box-shadow:0 4px 8px #2563eb25}
+.df-login-note{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:22px;font-size:9px;line-height:1.6;color:#94a3b8;text-align:center}
+.mobile-shell{font-family:'Be Vietnam Pro',sans-serif;max-width:480px;padding:0 16px 100px;background:linear-gradient(#fffdfb,#fffaf4);box-shadow:0 0 40px #4314070a;min-height:100vh}
+.mobile-shell .shipper-topbar{display:flex;align-items:center;justify-content:space-between;height:64px;background:#020617;color:white;margin:0 -16px;padding:0 16px;position:sticky;top:0;z-index:20}
+.shipper-topbar .df-logomark{width:32px;height:32px;padding-left:8px;border-radius:9px}.shipper-topbar .df-wordmark b{font-size:13px}.shipper-topbar .df-wordmark small{font-size:8px}
+.shipper-avatar{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#ea580c;font-size:11px;font-weight:700}
+.shipper-page-heading{display:flex;align-items:center;justify-content:space-between;padding:24px 0 18px}.shipper-page-heading p{font-size:12px;color:#94a3b8;margin:0 0 4px}.shipper-page-heading h1{font-size:22px;font-weight:700;letter-spacing:-.03em}
+.shipper-refresh{display:grid;place-items:center;width:36px;height:36px;background:white;border:1px solid #e2e8f0;color:#64748b;border-radius:10px;padding:0}
+.mobile-shell .task{padding:20px;border-color:#e2e8f0;border-radius:12px;background:#fff;box-shadow:0 3px 15px #43140703}
+.mobile-shell .task h2{font-size:16px;line-height:1.5;font-weight:700;letter-spacing:-.025em}.mobile-shell .task p{font-size:12px;color:#64748b;line-height:1.8}.mobile-shell .task small{font-size:10px;line-height:1.6}
+.mobile-shell .row{align-items:flex-start}.mobile-shell .row>div{min-width:0}.mobile-shell .badge{align-self:flex-start;white-space:nowrap;flex-shrink:0;font-size:10px;line-height:16px;padding:4px 8px;border-radius:999px}
+.mobile-shell .task button{font:600 12px 'Be Vietnam Pro',sans-serif;background:#ea580c;border-radius:10px;min-height:48px;box-shadow:0 3px 9px #ea580c15}.mobile-shell .task button.outline{background:white;border-color:#fed7aa;color:#c2410c;box-shadow:none}
+.mobile-shell .progress{background:#fff7ed;color:#c2410c;font-size:12px;border:1px solid #ffedd5}.mobile-shell .notice{background:#fff7ed;color:#9a3412;font-size:12px;line-height:1.7}
+.mobile-shell label{font-size:11px;font-weight:600;color:#64748b}.mobile-shell input,.mobile-shell select{font-family:inherit;font-size:12px;outline:0}.mobile-shell input:focus{border-color:#fb923c;box-shadow:0 0 0 3px #ffedd5}
+.mobile-shell nav{width:min(480px,100%);border-top:1px solid #e2e8f0;padding:8px 8px max(8px,env(safe-area-inset-bottom));background:white}
+.mobile-shell nav button{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;font-size:10px;font-weight:600;min-height:48px;color:#94a3b8;background:transparent;border-radius:8px}
+.mobile-shell nav button[aria-current='page']{color:#ea580c;background:#fff7ed}
+@media(max-width:420px){.login-shell{padding:20px}.login-shell .card{padding:28px}.df-login-note{font-size:8px}}

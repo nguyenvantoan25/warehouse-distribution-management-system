@@ -1,227 +1,501 @@
-<<<<<<< HEAD
-# Báo cáo xây dựng dự án DistriFlow
+# DistriFlow — báo cáo triển khai PostgreSQL
 
-> Cập nhật: 23/11/2026 · Mã nguồn triển khai: [`distriflow/`](./distriflow/)
+Mã nguồn: [distriflow](./distriflow). Báo cáo nằm ngoài folder code. Cập nhật ngày 23/11/2026.
 
-## 1. Mục tiêu và phạm vi
+## 1. Trạng thái thực tế và nguồn dữ liệu
 
-DistriFlow là nền tảng quản lý **bàn giao kiện điện tử tại kho** giữa kho và shipper. Nguồn yêu cầu được đọc từ thư mục `Agents`, trong đó tệp Excel là nguồn nghiệp vụ ưu tiên. Hệ thống kết thúc khi kho và shipper xác nhận bàn giao thành công; không triển khai giao hàng cuối chặng, giỏ hàng, COD, thanh toán hay định vị shipper.
+Theo lựa chọn của bạn: **PostgreSQL trống để tự nhập dữ liệu qua giao diện**, không chuyển dữ liệu demo và không dựng số liệu kinh doanh.
 
-Mã được xây dựng là một vertical slice P0 có thể khởi động bằng Docker, gồm giao diện Vue 3 và API FastAPI/PostgreSQL. Một số module P0/P1 rộng hơn vẫn là backlog; xem phần “Giới hạn”.
+- PostgreSQL đã chạy bằng container riêng, chỉ bind localhost cổng **55432**.
+- Phiên bản quan sát: **PostgreSQL 16.15**, schema Alembic **20261123_01**.
+- Chỉ chuyển **5 tài khoản và password hash hiện có** từ SQLite, giữ mật khẩu bạn đã cập nhật. Không chuyển session hoặc phạm vi kho/đối tác demo.
+- Tất cả bảng nghiệp vụ đang trống: kho, tổ chức, SKU, vị trí, cung ứng, tồn, nhập, xuất, nhiệm vụ, kiện và biên nhận đều **0 bản ghi** tại thời điểm kiểm tra.
+- SQLite cũ và các backup vẫn giữ nguyên; chưa xóa hoặc sửa dữ liệu nghiệp vụ cũ.
+- Dashboard đọc database; không có dữ liệu thì hiển thị 0/trống. KPI là toàn bộ phiếu trong kho; biểu đồ là 30 ngày gần nhất. Giao diện ghi rõ nguồn database và thời điểm tải.
 
-## 2. Những thay đổi đã thực hiện
+Bằng chứng số lượng từng bảng: [database-status.json](./docs/database-status.json). Đây là ảnh chụp trạng thái có timestamp, không phải dữ liệu live sau khi bạn bắt đầu nhập. Đọc lại bất kỳ lúc nào:
 
-| Hạng mục | Thay đổi |
-|---|---|
-| Kiến trúc | Tạo monorepo mới `distriflow/`, không chỉnh cơ học demo React trong `Agents` vì demo này có luồng ngoài phạm vi. |
-| Frontend | Tạo Vue 3 + TypeScript + Vue Router, màn hình desktop tổng quan kho (UI01) và màn hình shipper di động (UI08–UI10). |
-| Thiết kế | Áp dụng token `#087F8C`, sidebar `#172B3A`, nền `#F4F6F8`, component `StatusBadge`, responsive desktop/mobile. |
-| Backend | Tạo FastAPI, SQLAlchemy và schema PostgreSQL; có seed dữ liệu local, API dashboard, nhiệm vụ shipper, nhận nhiệm vụ, đến kho, quét kiện và xác nhận hai bên. |
-| An toàn nghiệp vụ | Kiểm tra nhiệm vụ đúng shipper, optimistic version, `Idempotency-Key`, không tăng tiến độ khi quét trùng/sai, và chỉ ghi xuất khi đủ hai xác nhận. |
-| Vận hành | Thêm Docker Compose, Dockerfile, `.env.example`, API contract rút gọn và test quy tắc công thức tồn. |
+~~~powershell
+cd distriflow/backend
+python -m app.setup.status
+~~~
 
-## 3. Cấu trúc hệ thống
+**Chưa có dữ liệu nghiệp vụ thật được cung cấp.** Không gọi dữ liệu test/demo là dữ liệu thật. Các tên, SKU và số lượng trong bộ kiểm thử chỉ là fixture ở database kiểm thử, không nằm trong database sử dụng.
 
-```mermaid
-flowchart LR
-  U[Quản trị kho / Điều phối] --> FE[Vue 3 Frontend]
-  S[Shipper mobile] --> FE
-  FE -->|REST JSON /api/v1| API[FastAPI]
-  API --> AUTH[Auth + RBAC / record scope]
-  API --> HANDOVER[Handover service]
-  HANDOVER --> INV[Inventory ledger]
-  API --> DB[(PostgreSQL 16)]
-  HANDOVER --> DB
-  INV --> DB
-  API --> DOC[Biên nhận + Audit]
-```
+## 2. Những gì đã sửa
 
-Luồng nghiệp vụ chính:
+- Chuyển cấu hình runtime sang PostgreSQL qua psycopg; bỏ fallback tự động về SQLite.
+- Thêm Alembic với revision DDL cố định; startup chỉ nâng schema, không tự seed.
+- Thêm foreign key thật cho chủ hàng/SKU/kho của inventory_balances.
+- Tách seed demo thành app/demo_seed.py, chỉ cho phép chạy khi chỉ định SQLite và xác nhận demo. app/seed.py nay chỉ tương thích lệnh cũ bằng cách migrate schema, không chèn dữ liệu.
+- Thêm bootstrap chỉ chuyển tài khoản/hash; từ chối target đã có dữ liệu, không copy chứng từ/tồn.
+- Thêm khai báo kho đầu tiên trên giao diện và quản lý phạm vi tài khoản/membership, để bạn tự cấu hình từ database trống.
+- Tách frontend admin thành dashboard, dispatch, handover; admin chỉ giữ layout.
+- Tách schema khỏi router của auth/catalog/inventory; tách session service, tồn kho service, dashboard và audit thành file riêng.
+- Giữ luồng nhập → giữ hàng → soạn/đóng kiện → shipper → xác nhận kho; xuất tồn theo số lượng SKU, không theo số kiện.
+- Giữ CSRF, access policy, scope, version, idempotency và audit transaction.
 
-```mermaid
-sequenceDiagram
-  participant R as Chủ hàng
-  participant K as Kho
-  participant S as Shipper
-  participant A as API + PostgreSQL
-  R->>A: Tạo yêu cầu xuất
-  K->>A: Duyệt và giữ hàng (transaction)
-  K->>A: Soạn, đóng gói, tạo/gán nhiệm vụ
-  S->>A: Nhận nhiệm vụ, đến kho
-  S->>A: Quét đủ các kiện hợp lệ
-  S->>A: Xác nhận nhận hàng
-  K->>A: Xác nhận bàn giao cùng phiên bản
-  A->>A: Ghi xuất + giảm on_hand/reserved + biên nhận (một transaction)
-  A-->>K: Biên nhận bàn giao
-  A-->>S: Trạng thái đã bàn giao
-```
+Hướng dẫn Sites được áp dụng ở chế độ local cho phần giao diện: giữ Vue/thiết kế hiện có, bổ sung trạng thái trống và kiểm thử responsive. Không publish lên hosting ngoài.
 
-## 4. Sơ đồ ERD cơ sở dữ liệu
+## 3. Cách chạy
 
-```mermaid
+Docker Desktop cần đang chạy. Từ thư mục gốc:
+
+~~~powershell
+# Bật PostgreSQL riêng của dự án
+docker compose --env-file distriflow/infra/.env -f distriflow/infra/compose.yaml up -d db
+
+# Terminal backend: migrate rồi chạy, KHÔNG seed demo
+.\distriflow\backend\start.ps1
+
+# Terminal frontend
+.\distriflow\frontend\start.ps1
+~~~
+
+- Giao diện: http://127.0.0.1:5173/login
+- API: http://127.0.0.1:8000/docs
+- Liveness: http://127.0.0.1:8000/health
+- Database readiness: http://127.0.0.1:8000/health/ready
+- Không chạy thêm tiến trình cùng cổng nếu đã có ứng dụng đang chạy.
+
+### Cấu hình
+
+- backend/.env chứa DATABASE_URL tới PostgreSQL localhost:55432 và COOKIE_SECURE.
+- infra/.env chứa mật khẩu PostgreSQL riêng; cả hai file đã loại khỏi Git.
+- Ví dụ cấu hình: [backend/.env.example](./distriflow/backend/.env.example), [infra/.env.example](./distriflow/infra/.env.example).
+- Biến môi trường shell có độ ưu tiên cao hơn .env. Không chia sẻ URL có mật khẩu.
+- Dùng COOKIE_SECURE=true khi có HTTPS.
+- Tài khoản local: [accounts.local.json](./distriflow/backend/accounts.local.json), không đưa vào Git.
+
+Sửa password trong JSON **không tự đổi password hash trong PostgreSQL**. Đổi mật khẩu tương tác:
+
+~~~powershell
+cd distriflow/backend
+python -m app.manage password admin
+~~~
+
+Lệnh thu hồi session cũ; không tự sửa file JSON. Các mật khẩu bạn đã yêu cầu đồng bộ trước đó được giữ khi chuyển tài khoản.
+
+### Cài máy mới
+
+Python 3.12+, Node 22/pnpm 9, Docker Desktop:
+
+~~~powershell
+cd distriflow/backend
+python -m pip install -r requirements.txt
+# Cấu hình backend/.env, infra/.env và bật PostgreSQL trước
+python -m app.setup.migrate
+cd ../frontend
+corepack pnpm install --frozen-lockfile
+~~~
+
+Bootstrap tài khoản chỉ cần khi tạo database mới có sẵn SQLite nguồn và chủ đích giữ tài khoản:
+
+~~~powershell
+cd distriflow/backend
+python -m app.setup.bootstrap --accounts-from-sqlite distriflow.db
+~~~
+
+**Không chạy lại bootstrap trên database đang dùng.** Nó từ chối nếu target đã có bất kỳ record nào; không xóa hoặc ghi đè để ép nhập.
+
+## 4. Nhập dữ liệu thật lần đầu
+
+1. Đăng nhập admin, vào **Danh mục & vị trí → Kho**, nhập tên kho thực tế. Tài khoản admin được gán kho vừa khai báo; chưa hỗ trợ admin tạo thêm nhiều kho ngoài scope.
+2. Vào **Đối tác**, nhập supplier và chủ hàng/retailer thật.
+3. Trong Danh mục, nhập **SKU + tên hàng + đơn vị cơ sở**, **vị trí kho**, **quan hệ supplier/chủ hàng/SKU**.
+4. Vào **Tài khoản & phạm vi**, gán kho cho dispatch/shipper; gán kho và đúng tổ chức cho supplier/retailer. Tài khoản được thay đổi cần đăng nhập lại.
+5. Supplier hoặc admin tạo yêu cầu nhập; admin duyệt, kiểm nhận hàng tốt/cách ly và xác nhận vị trí cất. Chỉ bước cất hàng mới tăng tồn.
+6. Retailer hoặc admin tạo yêu cầu xuất; admin duyệt giữ hàng, soạn và đóng kiện.
+7. Điều phối gán shipper nếu chọn DistriFlow. Shipper nhận, báo đến kho, đối chiếu đủ mã và xác nhận.
+8. Admin xác nhận tại kho: xuất đúng lượng SKU và tạo một biên nhận trong cùng transaction.
+
+Không có nút tự sinh tồn đầu kỳ giả. Nếu cần tồn đầu kỳ, cần chứng từ nhập phản ánh số lượng kiểm đếm thật. Hiện không có import Excel/CSV tự động.
+
+## 5. Cấu trúc file theo module
+
+~~~text
+Class/
+  README.md
+  docs/
+    database-status.json             Bằng chứng metadata/số lượng thực tế
+    screenshots/
+  distriflow/
+    backend/
+      app/
+        main.py                      Bootstrap API, routers, error/health
+        models.py                    Registry SQLAlchemy
+        core/
+          config.py                  .env và cấu hình
+          database.py                Engine/session, pool pre-ping
+          commands.py                Transaction, replay và audit
+          schemas.py                 Version và dòng hàng dùng chung
+        setup/
+          migrate.py                 Alembic upgrade
+          bootstrap.py               Chuyển account hash, không nghiệp vụ
+          status.py                  Đọc metadata/số lượng, không secrets
+        modules/
+          auth/
+            models.py access.py schemas.py service.py router.py scopes.py
+          catalog/
+            models.py schemas.py service.py router.py
+          inbound/
+            models.py schemas.py service.py router.py
+          outbound/
+            models.py schemas.py service.py router.py
+          inventory/
+            models.py schemas.py service.py router.py
+          dispatch/
+            models.py schemas.py projections.py service.py commands.py router.py
+          handover/
+            models.py schemas.py service.py router.py
+          platform/
+            dashboard.py audit.py router.py
+        manage.py                    Đổi mật khẩu tương tác
+        seed.py                      Migrate-only, không chèn demo
+        demo_seed.py                 Demo SQLite có chốt xác nhận
+      migrations/
+        env.py script.py.mako
+        versions/20261123_01_initial_schema.py
+      alembic.ini
+      tests/
+        test_access.py test_workflow.py test_onboarding.py
+        run_postgres.py              Database kiểm thử riêng
+        serve_e2e.py                 API E2E với SQLite cô lập
+      start.ps1 requirements.txt
+    frontend/src/
+      app/access.ts                  Session và can(permission)
+      router/index.ts                Guard tất cả matched routes
+      features/
+        admin/AdminLayout.vue        Shell quản trị
+        dashboard/                   DashboardPage, FlowChart
+        dispatch/                    Điều phối
+        handover/                    List, detail, TaskTable, useOperations
+        auth/                        Login, forbidden
+        accounts/                    Gán kho và tổ chức tài khoản
+        catalog/                     Danh mục, kho và đối tác
+        inbound/ outbound/           Chứng từ nhập/xuất
+        inventory/                   Tồn và lịch sử
+        partner/ shipper/            Cổng đối tác và shipper
+      shared/api/                    HTTP/CSRF/idempotency
+      shared/components/             Form/bảng/trạng thái
+      shared/types/                  DTO
+    contracts/
+      openapi.json
+      schema.postgresql.sql          SQL sinh từ revision Alembic
+    infra/
+      compose.yaml .env.example
+~~~
+
+### Kiến trúc hệ thống
+
+~~~mermaid
+flowchart TB
+    U[Admin / Điều phối / Supplier / Retailer / Shipper] --> FE[Vue 3 / TypeScript]
+    FE --> RG[Route guard / access]
+    FE --> HTTP[HTTP / cookie / CSRF / command key]
+    HTTP -->|/api/v1| API[FastAPI routers + schemas]
+    API --> AUTH[Auth / quyền / kho / membership]
+    AUTH --> CAT[Catalog]
+    AUTH --> IN[Inbound]
+    AUTH --> OUT[Outbound]
+    AUTH --> DIS[Dispatch]
+    AUTH --> HAN[Handover]
+    AUTH --> PL[Dashboard / Audit]
+    OUT --> DIS
+    IN --> INV[Inventory service]
+    OUT --> INV
+    HAN --> INV
+    CAT --> CMD[Transaction / replay / audit]
+    IN --> CMD
+    OUT --> CMD
+    DIS --> CMD
+    HAN --> CMD
+    CMD --> PG[(PostgreSQL 16 / dữ liệu sử dụng)]
+    INV --> PG
+    PL --> PG
+    MIG[Alembic / frozen revisions] -->|DDL| PG
+    TEST[API tests] --> TPG[(distriflow_module_tests)]
+    E2E[Browser workflow fixtures] --> TS[(SQLite E2E riêng)]
+~~~
+
+Test không dùng database nghiệp vụ để ghi chứng từ. Kiểm thử live PostgreSQL chỉ đăng nhập, đọc trạng thái trống rồi logout.
+
+## 6. ERD PostgreSQL
+
+Chia thành các nhóm để dễ đọc; cùng tên bảng ở hai sơ đồ là cùng một bảng. Các cạnh dưới đây là FK thật, ngoại trừ chỗ ghi rõ quan hệ chuỗi ở phần ghi chú.
+
+### Tài khoản và danh mục
+
+~~~mermaid
 erDiagram
-  ORGANIZATIONS ||--o{ USER_MEMBERSHIPS : has
-  USERS ||--o{ USER_MEMBERSHIPS : has
-  ORGANIZATIONS ||--o{ INVENTORY_BALANCES : owns
-  INVENTORY_BALANCES ||--o{ STOCK_RESERVATIONS : reserves
-  OUTBOUND_REQUESTS ||--o{ OUTBOUND_LINES : contains
-  OUTBOUND_LINES ||--o{ STOCK_RESERVATIONS : reserves
-  OUTBOUND_REQUESTS ||--o{ PACKAGES : creates
-  PICKUP_TASKS ||--o{ PACKAGES : contains
-  PICKUP_TASKS ||--o{ PACKAGE_SCANS : records
-  PACKAGES ||--o{ PACKAGE_SCANS : scanned
-  PICKUP_TASKS ||--o{ HANDOVER_CONFIRMATIONS : receives
-  PICKUP_TASKS ||--|| HANDOVER_RECEIPTS : produces
-  PICKUP_TASKS ||--o{ STOCK_MOVEMENTS : causes
-  USERS ||--o{ IDEMPOTENCY_REQUESTS : retries
+    users ||--o{ access_sessions : authenticates
+    users ||--o{ partner_memberships : belongs
+    organizations ||--o{ partner_memberships : members
+    organizations ||--o{ skus : owns
+    organizations ||--o{ supply_relationships : supplier_or_owner
+    skus ||--o{ supply_relationships : allowed
+    warehouses ||--o{ storage_locations : contains
+    users {
+        string id PK
+        string username UK
+        string password_hash
+        string role
+        string warehouse_scope
+        boolean active
+    }
+    skus {
+        string id PK
+        string code UK
+        string owner_id FK
+        string name
+        string base_unit
+    }
+    organizations {
+        string id PK
+        string name
+        string kind
+        boolean active
+    }
+~~~
 
-  USERS { uuid id PK string email string password_hash boolean active }
-  ORGANIZATIONS { uuid id PK string type string name }
-  INVENTORY_BALANCES { uuid id PK uuid owner_id string sku_code int on_hand int reserved int unavailable }
-  OUTBOUND_REQUESTS { uuid id PK uuid owner_id string status int version }
-  PICKUP_TASKS { uuid id PK string code string shipper_id string status int version }
-  PACKAGES { uuid id PK uuid task_id string code }
-  PACKAGE_SCANS { uuid id PK uuid task_id uuid package_id datetime at }
-  HANDOVER_CONFIRMATIONS { uuid id PK uuid task_id string side int version }
-  HANDOVER_RECEIPTS { uuid id PK uuid task_id string number }
-  STOCK_MOVEMENTS { uuid id PK string source_task_id string kind int quantity }
-```
+users.warehouse_scope hiện vẫn là tên kho dạng chuỗi, được service kiểm tra; chưa đổi thành FK hoặc mô hình nhiều kho. pickup_tasks.shipper_id và warehouse_name cũng là chuỗi legacy; không giả định đã có FK ở hai cột này.
 
-Các ràng buộc quan trọng: `packages.code` duy nhất, mỗi kiện chỉ quét một lần trong nhiệm vụ, xác nhận duy nhất theo `(task, side, version)`, một biên nhận cho một nhiệm vụ và một stock issue cho một nhiệm vụ. Công thức tồn: `on_hand = available + reserved + unavailable`; mọi lượng không âm.
+### Nhập, xuất và tồn
 
-## 5. Sơ đồ class (backend)
+~~~mermaid
+erDiagram
+    organizations ||--o{ inbound_requests : supplier_or_owner
+    warehouses ||--o{ inbound_requests : receives
+    inbound_requests ||--|{ inbound_lines : contains
+    skus ||--o{ inbound_lines : item
+    inbound_lines ||--o| inbound_postings : stocked_once
+    inventory_balances ||--o{ inbound_postings : increases
+    organizations ||--o{ outbound_requests : owns
+    warehouses ||--o{ outbound_requests : fulfills
+    outbound_requests ||--|{ outbound_lines : contains
+    skus ||--o{ outbound_lines : item
+    outbound_lines ||--o{ outbound_allocations : reserves
+    inventory_balances ||--o{ outbound_allocations : allocated_from
+    organizations ||--o{ inventory_balances : owner_FK
+    skus ||--o{ inventory_balances : sku_code_FK
+    warehouses ||--o{ inventory_balances : warehouse_FK
+    inventory_balances ||--o| balance_locations : located
+    storage_locations ||--o{ balance_locations : stores
+    inventory_balances {
+        string id PK
+        string owner_id FK
+        string sku_code FK
+        string warehouse_id FK
+        int on_hand
+        int reserved
+        int unavailable
+    }
+    outbound_requests {
+        string id PK
+        string owner_id FK
+        string warehouse_id FK
+        string shipper_mode
+        string shipper_id
+        string status
+        int version
+    }
+~~~
 
-```mermaid
+### Kiện, bàn giao và ghi xuất
+
+~~~mermaid
+erDiagram
+    outbound_requests ||--o| outbound_tasks : links
+    pickup_tasks ||--o| outbound_tasks : links
+    pickup_tasks ||--|{ packages : contains
+    packages ||--o{ package_items : contents
+    outbound_lines ||--o{ package_items : packed_quantity
+    pickup_tasks ||--o{ stock_reservations : holds
+    inventory_balances ||--o{ stock_reservations : reserved_from
+    stock_reservations ||--o| inventory_postings : issued_once
+    pickup_tasks ||--o{ inventory_postings : issue
+    inventory_balances ||--o{ inventory_postings : decreases
+    pickup_tasks ||--o{ package_scans : scans
+    packages ||--o{ package_scans : checked
+    pickup_tasks ||--o{ handover_confirmations : confirms
+    pickup_tasks ||--o| handover_receipts : receipt
+~~~
+
+Hai bảng hạ tầng command_receipts và audit_logs lưu actor/action/key/response hoặc trạng thái trước/sau. ID actor/đối tượng trong hai bảng là chuỗi, không có FK. Bảng stock_movements và idempotency_requests giữ để tương thích legacy, không dùng cho giao dịch mới.
+
+### Ràng buộc chính
+
+- available = on_hand - reserved - unavailable.
+- Check không âm trên reserved/unavailable; on_hand phải đủ reserved + unavailable.
+- inventory_balances có FK chủ hàng, SKU code và kho trong PostgreSQL mới; không tự ALTER SQLite cũ.
+- Biên nhận duy nhất theo task; posting xuất duy nhất theo reservation; posting nhập duy nhất theo dòng nhập.
+- Scan duy nhất theo task/kiện; xác nhận duy nhất theo task/bên/version.
+- Cùng actor/key/nội dung replay response, khác nội dung trả 409.
+- Thiếu một SKU khi giữ/xuất thì rollback toàn lệnh, không ghi một phần.
+
+## 7. Class và luồng transaction
+
+~~~mermaid
 classDiagram
-  class InventoryBalance { +id: UUID +owner_id: UUID +on_hand: int +reserved: int +unavailable: int }
-  class PickupTask { +id: UUID +code: string +shipper_id: UUID +status: HandoverStatus +version: int }
-  class Package { +id: UUID +task_id: UUID +code: string }
-  class PackageScan { +task_id: UUID +package_id: UUID +at: datetime }
-  class HandoverConfirmation { +task_id: UUID +side: Side +version: int +actor_id: UUID }
-  class Receipt { +task_id: UUID +number: string }
-  class StockMovement { +source_task_id: UUID +kind: string +quantity: int }
-  class IdempotencyRequest { +actor_id: UUID +key: string +response_status: string }
-  PickupTask "1" --> "many" Package
-  PickupTask "1" --> "many" PackageScan
-  Package "1" --> "many" PackageScan
-  PickupTask "1" --> "many" HandoverConfirmation
-  PickupTask "1" --> "1" Receipt
-  PickupTask "1" --> "1" StockMovement
-```
+    class InboundRequest {
+        status: string
+        version: int
+    }
+    class OutboundRequest {
+        status: string
+        version: int
+        shipper_mode: string
+    }
+    class PickupTask {
+        shipper_id: string
+        status: string
+        version: int
+    }
+    class InventoryBalance {
+        on_hand: int
+        reserved: int
+        unavailable: int
+    }
+    class StockReservation {
+        quantity: int
+        state: string
+    }
+    class Receipt {
+        number: string
+        issued_at: datetime
+    }
+    class InboundService {
+        <<module>>
+        create()
+        review()
+        receive()
+        putaway()
+    }
+    class OutboundService {
+        <<module>>
+        create()
+        approve()
+        pick()
+        pack()
+        cancel()
+    }
+    class HandoverService {
+        <<module>>
+        scan()
+        shipper_confirm()
+        warehouse_confirm()
+    }
+    class InventoryService {
+        <<module>>
+        issue_reserved_stock()
+        hold_stock()
+    }
+    class Commands {
+        <<module>>
+        execute()
+    }
+    InboundService ..> InboundRequest
+    InboundService ..> InventoryBalance
+    OutboundService ..> OutboundRequest
+    OutboundService ..> PickupTask
+    OutboundService ..> StockReservation
+    PickupTask "1" --> "*" StockReservation
+    StockReservation "*" --> "1" InventoryBalance
+    HandoverService ..> PickupTask
+    HandoverService ..> InventoryService
+    HandoverService ..> Receipt
+    Commands ..> InboundService
+    Commands ..> OutboundService
+    Commands ..> HandoverService
+~~~
 
-## 6. Mô tả chức năng
+Model là lớp SQLAlchemy thật. Hộp stereotype module biểu diễn file service viết bằng hàm, không phải class Python giả.
 
-| Nhóm chức năng | UC / UI | Cách hoạt động | Quy tắc chính |
-|---|---|---|---|
-| Đăng nhập và quyền | M01.01–02 / UI13 | Xác định vai trò và phạm vi tổ chức/kho trước khi mở dữ liệu. | Backend mới là nơi quyết định quyền; không tin `owner_id` gửi từ client. |
-| Danh mục | M02 / UI12 | Quản lý tổ chức, SKU, kho, shipper. | SKU/đơn vị và owner rõ ràng. |
-| Nhập kho và tồn | M03–M04 / UI02–03 | Duyệt, kiểm nhận, xếp vị trí; xem tồn theo chủ hàng. | Không âm; chỉ nhập hoàn tất mới tăng tồn. |
-| Yêu cầu xuất | M05–M06 / UI04, UI06 | Chủ hàng tạo yêu cầu, kho duyệt/giữ, sau đó soạn và đóng gói. | Gửi yêu cầu chưa giữ hàng; soạn/đóng gói chưa giảm tổng tồn. |
-| Điều phối | M07 / UI07 | Gán shipper được chỉ định hoặc phương án điều phối được duyệt. | Không tự đổi phương án khi shipper từ chối. |
-| Shipper tại kho | M08 / UI08–11 | Nhận nhiệm vụ → đến kho → quét từng kiện → xác nhận nhận hàng. | Quét sai/trùng không tăng tiến độ; QR không cấp quyền; chỉ có 4 tab mobile. |
-| Bàn giao & biên nhận | M06.04, M08.04–06 | Kho và shipper xác nhận cùng phiên bản; API phát hành biên nhận. | Ghi xuất đúng một lần, retry an toàn bằng idempotency key. |
-| Dashboard/báo cáo | M09 / UI01, UI14 | Hiển thị khả dụng, giữ, hàng chờ và danh sách bàn giao. | Số liệu xuất phát từ API/DB, không là biến đếm cục bộ. |
+~~~mermaid
+sequenceDiagram
+    actor Kho
+    participant Router
+    participant Commands
+    participant Handover
+    participant Inventory
+    participant PG as PostgreSQL
+    Kho->>Router: Xác nhận kho + version + key + CSRF
+    Router->>PG: Kiểm tra quyền và task trong kho
+    Router->>Commands: execute
+    Commands->>PG: Tìm command receipt actor/key
+    alt Cùng lệnh đã hoàn tất
+        PG-->>Commands: Response đã lưu
+    else Lệnh mới
+        Commands->>Handover: warehouse_confirm
+        Handover->>PG: Kiểm tra version và xác nhận shipper
+        Handover->>Inventory: issue_reserved_stock
+        Inventory->>PG: Khóa reservation/số dư; UPDATE có điều kiện
+        Handover->>PG: Xác nhận kho + biên nhận + trạng thái
+        Commands->>PG: Audit + command receipt + COMMIT
+        Note over Commands,PG: Lỗi bất kỳ: ROLLBACK, không xuất một phần
+    end
+    Commands-->>Kho: Kết quả
+~~~
 
-## 7. Cách chạy và kiểm tra
+## 8. Chức năng và phân quyền
 
-1. Sao chép `distriflow/.env.example` thành `distriflow/.env` và đặt mật khẩu PostgreSQL local.
-2. Tại `distriflow`, chạy `docker compose -f infra/compose.yaml up --build`.
-3. Mở `http://localhost:5173/admin/dashboard` hoặc `http://localhost:5173/shipper/tasks`.
-4. Với shipper: nhận nhiệm vụ, đến kho, quét `PKG-001`, `PKG-002`, `PKG-003`, rồi xác nhận. API giữ trạng thái “chờ đủ xác nhận” cho đến khi kho gọi endpoint `warehouse-confirm` cùng phiên bản.
+| Module | Chức năng | Người dùng/phạm vi |
+| --- | --- | --- |
+| Auth | Login/logout, cookie HttpOnly, CSRF, hồ sơ access | User active, session còn hạn |
+| Tài khoản | Gán kho và đúng tổ chức, thu hồi phiên tài khoản đổi scope | Admin; chỉ tài khoản chưa gán hoặc cùng kho |
+| Catalog | Tạo/xem kho đầu tiên, đối tác, SKU, vị trí, cung ứng | Admin tạo; đối tác đọc phần liên quan |
+| Inbound | Gửi, duyệt/từ chối, kiểm nhận tốt/cách ly, cất tăng tồn | Supplier của mình; admin trong kho |
+| Outbound | Gửi, duyệt giữ hàng, soạn, đóng kiện, hủy trước packing | Retailer của mình; admin xử lý |
+| Inventory | Số dư theo owner/SKU/vị trí, lịch sử, khóa/mở lượng hàng | Admin quản lý; retailer chỉ tồn của mình |
+| Dispatch | Phân công shipper cùng kho, nhận và báo đến kho | Dispatch/admin; shipper đúng nhiệm vụ |
+| Handover | Quét đủ kiện, xác nhận hai bên, ghi xuất, biên nhận JSON/in chi tiết | Shipper được phân và admin kho |
+| Platform | Dashboard 30 ngày, audit API | Admin/dispatch xem dashboard; admin xem audit |
 
-Đã chạy thành công trong workspace:
+Nguồn quyền: auth/access.py. Frontend dùng can(permission), router kiểm tra mọi matched route; backend kiểm tra độc lập. Sai quyền/phạm vi trả 403/404; version cũ/sai bước/xung đột trả 409.
 
-```text
-python -m pytest -q                         → 1 passed
-FastAPI TestClient P0 handover flow          → OK
-```
+Luồng trạng thái: nhập submitted → approved → received → stocked; từ chối từ submitted. Xuất submitted → approved → picked → packed → handed_over; chỉ hủy ở submitted/approved và giải phóng phần đã giữ. Task ready_for_handover → pending_confirmations → handed_over.
 
-Kịch bản API đã kiểm tra: nhận nhiệm vụ → đến kho → quét ba kiện → shipper xác nhận → kho xác nhận → trạng thái `handed_over`.
+API đầy đủ: [openapi.json](./distriflow/contracts/openapi.json). POST nghiệp vụ cần Idempotency-Key và CSRF; chuyển bước cần version. Account scope là cấu hình quản trị, chưa dùng version riêng.
 
-Các quality gate frontend/container sau đã được khai báo nhưng **chưa thể chạy trong workspace này vì không có `node`, `npm`, Docker hay PostgreSQL trên PATH**:
+## 9. Kiểm chứng và bảo trì schema
 
-```bash
-# frontend
-npm run lint && npm run type-check && npm run test:unit && npm run build
-# backend
-pytest
-```
+Đã kiểm tra đợt này:
 
-## 8. Giới hạn và việc tiếp theo
+- 17 backend tests đạt trên **PostgreSQL thật** trong database distriflow_module_tests, schema cô lập từng test rồi dọn.
+- 17 backend tests nhanh đạt trên SQLite in-memory, không phải bằng chứng thay thế PostgreSQL.
+- 3 E2E module đạt: danh mục lưu reload, khởi tạo kho/gán scope, full nhập → xuất → bàn giao.
+- 6 E2E live/giao diện đạt: xác nhận PostgreSQL trống, desktop/mobile và tab shipper.
+- TypeScript/Vite build đạt; Alembic check không có khác biệt model/schema.
+- Có cảnh báo deprecation thư viện/UTC legacy, không phải lỗi test. Chưa kiểm thử tải cao hoặc production.
 
-- Đây là vertical slice P0, chưa hoàn chỉnh toàn bộ 50 UC: auth thực, CRUD danh mục/nhập/xuất, retailer/supplier portal, báo cáo, thông báo, Alembic migrations, audit đầy đủ và E2E còn cần triển khai.
-- `X-Demo-Actor` và `create_all()` chỉ dùng cho seed local. Trước triển khai thật phải thay bằng phiên HttpOnly/CSRF hoặc OIDC, RBAC theo membership, Alembic và PostgreSQL thật; tuyệt đối không dùng header demo trong production.
-- Endpoint `warehouse-confirm` đã có transaction logic mẫu; UI kho cần bổ sung màn hình chi tiết bàn giao để gọi nó bằng phiên bản trả từ server.
-- Cần bổ sung integration test PostgreSQL cho cạnh tranh giữ tồn, retry idempotent, phân quyền chéo chủ hàng/shipper và mất mạng (TC03, TC06–TC09).
-=======
-# warehouse-distribution-management-system
-A web-based system for warehouse operations, inventory tracking, order fulfillment, and last-mile delivery management.
-# Warehouse & Distribution Management System (WDMS)
+~~~powershell
+cd distriflow/backend
+python -m alembic current
+python -m alembic check
+python -m pytest -q
+python -m tests.run_postgres
+cd ../frontend
+corepack pnpm run build
+corepack pnpm run test:modules
+corepack pnpm run test:e2e
+~~~
 
-**Project Status:** In Development  
-**Project Type:** Team-based Web Application
+Trước lần chạy PostgreSQL tests đầu tiên, tạo database kiểm thử riêng:
 
-## Overview
+~~~powershell
+docker compose --env-file distriflow/infra/.env -f distriflow/infra/compose.yaml exec -T db createdb -U distriflow distriflow_module_tests
+~~~
 
-The Warehouse & Distribution Management System (WDMS) is a web-based logistics management platform designed to streamline warehouse operations, inventory control, wholesale order fulfillment, and last-mile delivery management.
+Không chạy test ghi nghiệp vụ trên database sử dụng. Test postgres-empty chỉ phù hợp **trước khi nhập dữ liệu thật**; sau đó chạy bộ responsive riêng bằng Playwright reference-layout.spec.ts. Các ảnh trong screenshots/modules là fixture kiểm thử, không phải số liệu vận hành.
 
-The system connects suppliers, warehouse staff, wholesale customers, and delivery personnel through centralized business workflows and a shared backend.
+Alembic quản lý revision và nâng schema bằng upgrade head theo [tài liệu chính thức](https://alembic.sqlalchemy.org/en/latest/tutorial.html). Container dùng volume bền vững và healthcheck theo [PostgreSQL Official Image](https://hub.docker.com/_/postgres). Không dùng docker compose down -v hoặc downgrade trên dữ liệu thật khi chưa có backup/được phê duyệt.
 
-## Planned Core Features
+## 10. Giới hạn còn lại
 
-### Warehouse Management
-- Supplier purchase order management
-- Barcode-based goods receiving and outbound verification
-- Inventory tracking by warehouse storage location
-- Stock transfers, adjustments, and inventory audits
-- Inbound and outbound order processing
-
-### Wholesale Order Management
-- Product catalog and wholesale ordering
-- Order approval and stock reservation
-- Picking, packing, and shipment preparation
-- Order status tracking
-
-### Delivery Management
-- Courier assignment and shipment handover
-- GPS-assisted delivery tracking
-- Barcode-based shipment verification
-- Proof of delivery and failed delivery handling
-
-### Administration
-- Role-based access control (RBAC)
-- Operational dashboards and reporting
-- Notifications and activity logs
-
-## User Roles
-
-1. **System Administrator** — Manages users, products, warehouse operations, orders, and delivery assignments.
-2. **Warehouse Staff** — Handles receiving, picking, packing, inventory updates, and shipment handovers.
-3. **Supplier** — Reviews and confirms supply requests.
-4. **Retailer / Wholesale Customer** — Places wholesale orders and tracks shipments.
-5. **Courier** — Collects shipments, updates delivery progress, and confirms deliveries.
-
-## Planned Architecture
-
-The project follows a monorepo structure containing three web portals, a shared backend API, and a centralized database.
-
-- **Internal Portal:** Administrator and warehouse staff
-- **Partner Portal:** Suppliers and wholesale customers
-- **Delivery Portal:** Couriers and delivery operations
-
-## Development Workflow
-
-- `main` — Stable releases
-- `develop` — Integration branch
-- `feature/*` — Individual development tasks
-
-Changes are submitted through GitHub Pull Requests for collaborative review and integration.
-
-## Technology Stack
-
-To be finalized during implementation.
-
-## Project Goal
-
-To build a centralized system that improves inventory visibility, warehouse operational accuracy, order processing efficiency, and shipment traceability.
->>>>>>> origin/main
+- Một role/một kho theo tên cho mỗi user; chưa nhiều-kho, chưa tạo/xóa tài khoản hoặc đổi role qua UI.
+- Danh mục chủ yếu tạo/xem; chưa sửa/xóa/nhập Excel hàng loạt.
+- Lượng hàng nguyên theo đơn vị cơ sở, chưa số lẻ/quy đổi/lot/serial/hạn dùng.
+- Đóng kiện tự chia lượng nguyên, chưa packing tương tác; biên nhận JSON và in trình duyệt, chưa PDF/ký số.
+- Chưa chuyển kho, hoàn/đảo sau đóng gói/bàn giao, kiểm kê, báo cáo chuyên sâu, cấu hình nghiệp vụ hoặc tích hợp hãng vận chuyển.
+- Cần rate limit login, giám sát, backup/restore theo lịch, HTTPS và tải đồng thời quy mô lớn trước production.
+- Docker DB đã kiểm chứng; profile full api/web có sẵn nhưng chưa được kiểm chứng triển khai toàn bộ bằng container.
