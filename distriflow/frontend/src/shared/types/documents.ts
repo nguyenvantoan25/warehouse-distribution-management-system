@@ -1,0 +1,2 @@
+export interface DocumentLine { id: string; skuId: string; skuCode: string; skuName: string; unit: string; quantity: number; good?: number; quarantined?: number }
+export interface StockDocument { id: string; code: string; ownerId: string; ownerName: string; warehouseId: string; warehouseName: string; status: string; version: number; createdAt: string; lines: DocumentLine[]; supplierName?: string; note?: string; taskId?: string; shipperMode?: string }
