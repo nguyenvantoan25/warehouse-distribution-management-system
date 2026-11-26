@@ -1,0 +1,13 @@
+{
+  "file": "DistriFlow-Shipper-debug.apk",
+  "applicationId": "com.distriflow.shipper.debug",
+  "version": "0.1.0-debug",
+  "minSdk": 26,
+  "targetSdk": 35,
+  "sizeBytes": 897825,
+  "sha256": "B0D8846598D6CE5388C5D1E4D53280BF4D7457EFB770A0FD40B31FB31A4EF7E4",
+  "builtAtUtc": "2026-11-26T01:55:22.0106407Z",
+  "androidJvmTests": 15,
+  "backendTests": 23,
+  "androidDeviceUiVerified": false
+}

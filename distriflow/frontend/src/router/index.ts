@@ -1,43 +1,25 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AdminDashboard from '../features/dashboard/DashboardPage.vue'
-import AdminLayout from '../features/admin/AdminLayout.vue'
-import HandoverList from '../features/handover/HandoverList.vue'
-import HandoverDetail from '../features/handover/HandoverDetail.vue'
-import DispatchPage from '../features/dispatch/DispatchPage.vue'
-import CatalogPage from '../features/catalog/CatalogPage.vue'
-import InboundPage from '../features/inbound/InboundPage.vue'
-import OutboundPage from '../features/outbound/OutboundPage.vue'
-import InventoryPage from '../features/inventory/InventoryPage.vue'
-import AccountScopesPage from '../features/accounts/AccountScopesPage.vue'
-import PartnerLayout from '../features/partner/PartnerLayout.vue'
-import ShipperTasks from '../features/shipper/ShipperTasks.vue'
-import LoginPage from '../features/auth/LoginPage.vue'
-import ForbiddenPage from '../features/auth/ForbiddenPage.vue'
+import { belongsToPortal } from '../app/portals'
+import { operationsRoutes } from '../portals/operations/routes'
+import { supplierRoutes } from '../portals/supplier/routes'
+import { retailerRoutes } from '../portals/retailer/routes'
+import { shipperRoutes } from '../portals/shipper/routes'
 import { auth, can, homePath, restoreSession } from '../app/access'
 
 const router = createRouter({ history: createWebHistory(), routes: [
-  { path: '/', redirect: () => homePath() },
-  { path: '/login', component: LoginPage },
-  { path: '/forbidden', component: ForbiddenPage },
-  { path: '/admin', component: AdminLayout, meta: { access: 'dashboard.read' }, children: [
-    { path: '', redirect: '/admin/dashboard' },
-    { path: 'dashboard', component: AdminDashboard },
-    { path: 'handovers', component: HandoverList, meta: { access: 'tasks.read' } },
-    { path: 'handovers/:id', component: HandoverDetail, meta: { access: 'tasks.read' } },
-    { path: 'dispatch', component: DispatchPage, meta: { access: 'dispatch.assign' } },
-    { path: 'catalog', component: CatalogPage, meta: { access: 'catalog.manage' } },
-    { path: 'partners', component: CatalogPage, meta: { access: 'catalog.manage' } },
-    { path: 'inbounds', component: InboundPage, meta: { access: 'inbound.manage' } },
-    { path: 'outbounds', component: OutboundPage, meta: { access: 'outbound.manage' } },
-    { path: 'inventory', component: InventoryPage, meta: { access: 'inventory.read' } },
-    { path: 'accounts', component: AccountScopesPage, meta: { access: 'accounts.manage' } },
-  ] },
-  { path: '/partner', component: PartnerLayout, meta: { access: 'catalog.read' }, children: [
-    { path: 'inbounds', component: InboundPage, meta: { access: 'inbound.read' } },
-    { path: 'outbounds', component: OutboundPage, meta: { access: 'outbound.read' } },
-    { path: 'inventory', component: InventoryPage, meta: { access: 'inventory.read' } },
-  ] },
-  { path: '/shipper/tasks', component: ShipperTasks, meta: { access: 'tasks.read.own' } },
+  // Resolve home only after restoring the session in beforeEach.
+  { path: '/', component: { render: () => null } },
+  { path: '/login', component: () => import('../features/auth/LoginPage.vue') },
+  { path: '/forbidden', component: () => import('../features/auth/ForbiddenPage.vue') },
+  ...operationsRoutes,
+  ...supplierRoutes,
+  ...retailerRoutes,
+  ...shipperRoutes,
+  // Preserve existing bookmarks; every destination still passes the access guard.
+  { path: '/partner', component: { render: () => null } },
+  { path: '/partner/inbounds', redirect: '/supplier/inbounds' },
+  { path: '/partner/outbounds', redirect: '/retailer/outbounds' },
+  { path: '/partner/inventory', redirect: '/retailer/inventory' },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ] })
 router.beforeEach(async (to) => {
@@ -45,7 +27,12 @@ router.beforeEach(async (to) => {
     try { await restoreSession() } catch { return to.path === '/login' ? true : '/login' }
   }
   if (!auth.user && to.path !== '/login') return '/login'
+  if (to.path === '/' || to.path === '/partner') return homePath()
   if (auth.user && to.path === '/login') return homePath()
-  if (to.matched.some(record => typeof record.meta.access === 'string' && !can(record.meta.access))) return '/forbidden'
+  if (to.matched.some(record => {
+    const portal = record.meta.portal
+    return (portal && !belongsToPortal(auth.user?.role ?? '', portal))
+      || (typeof record.meta.access === 'string' && !can(record.meta.access))
+  })) return '/forbidden'
 })
 export default router

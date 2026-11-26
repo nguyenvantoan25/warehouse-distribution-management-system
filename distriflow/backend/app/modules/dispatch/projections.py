@@ -29,5 +29,5 @@ def task_dto(db: Session, task: PickupTask) -> TaskDto:
         version=task.version,
         receiptId=(db.scalar(select(Receipt.id).where(Receipt.task_id == task.id))),
         shipperId=task.shipper_id,
-        shipperName=shipper.username if shipper else "Chưa phân công",
+        shipperName=(shipper.display_name or shipper.username) if shipper else "Chưa phân công",
     )

@@ -368,4 +368,46 @@ CREATE INDEX ix_inventory_postings_task_id ON inventory_postings (task_id);
 
 INSERT INTO alembic_version (version_num) VALUES ('20261123_01') RETURNING alembic_version.version_num;
 
+-- Running upgrade 20261123_01 -> 20261126_02
+
+ALTER TABLE storage_locations ADD COLUMN rack_row INTEGER;
+
+ALTER TABLE storage_locations ADD COLUMN rack_level INTEGER;
+
+ALTER TABLE storage_locations ADD COLUMN rack_bay INTEGER;
+
+ALTER TABLE storage_locations ADD COLUMN rack_depth INTEGER;
+
+ALTER TABLE storage_locations ADD CONSTRAINT uq_storage_rack_coordinate UNIQUE (warehouse_id, rack_row, rack_level, rack_bay, rack_depth);
+
+ALTER TABLE storage_locations ADD CONSTRAINT ck_storage_rack_coordinate CHECK ((rack_row IS NULL AND rack_level IS NULL AND rack_bay IS NULL AND rack_depth IS NULL) OR (rack_row IS NOT NULL AND rack_level IS NOT NULL AND rack_bay IS NOT NULL AND rack_depth IS NOT NULL AND rack_row BETWEEN 1 AND 8 AND rack_level BETWEEN 1 AND 10 AND rack_bay BETWEEN 1 AND 5 AND rack_depth BETWEEN 1 AND 2));
+
+UPDATE alembic_version SET version_num='20261126_02' WHERE alembic_version.version_num = '20261123_01';
+
+-- Running upgrade 20261126_02 -> 20261126_03
+
+ALTER TABLE storage_locations DROP CONSTRAINT ck_storage_rack_coordinate;
+
+ALTER TABLE storage_locations DROP CONSTRAINT uq_storage_rack_coordinate;
+
+UPDATE storage_locations SET rack_bay = (rack_bay - 1) * 2 + rack_depth, rack_depth = 1 WHERE rack_row IS NOT NULL;
+
+ALTER TABLE storage_locations ADD CONSTRAINT ck_storage_rack_coordinate CHECK ((rack_row IS NULL AND rack_level IS NULL AND rack_bay IS NULL AND rack_depth IS NULL) OR (rack_row IS NOT NULL AND rack_level IS NOT NULL AND rack_bay IS NOT NULL AND rack_depth IS NOT NULL AND rack_row BETWEEN 1 AND 8 AND rack_level BETWEEN 1 AND 10 AND rack_bay BETWEEN 1 AND 10 AND rack_depth = 1));
+
+ALTER TABLE storage_locations ADD CONSTRAINT uq_storage_rack_coordinate UNIQUE (warehouse_id, rack_row, rack_level, rack_bay, rack_depth);
+
+UPDATE alembic_version SET version_num='20261126_03' WHERE alembic_version.version_num = '20261126_02';
+
+-- Running upgrade 20261126_03 -> 20261126_04
+
+ALTER TABLE users ADD COLUMN display_name VARCHAR;
+
+ALTER TABLE users ADD COLUMN deleted_at TIMESTAMP WITHOUT TIME ZONE;
+
+ALTER TABLE users ADD COLUMN version INTEGER DEFAULT 1 NOT NULL;
+
+ALTER TABLE organizations ADD COLUMN supplied_goods VARCHAR(1000);
+
+UPDATE alembic_version SET version_num='20261126_04' WHERE alembic_version.version_num = '20261126_03';
+
 COMMIT;

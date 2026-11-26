@@ -31,7 +31,7 @@ def shippers(
             User.warehouse_scope == user.warehouse_scope,
         )
     ).all()
-    return [{"id": person.id, "name": person.username} for person in people]
+    return [{"id": person.id, "name": person.display_name or person.username} for person in people]
 
 
 @router.get("/pickup-tasks", response_model=list[TaskDto])

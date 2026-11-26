@@ -1,8 +1,8 @@
 {
-  "observedAt": "2026-11-23T15:34:36.934411+00:00",
+  "observedAt": "2026-11-26T04:05:17.982598+00:00",
   "database": "postgresql",
   "serverVersion": "PostgreSQL 16.15 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
-  "schemaRevision": "20261123_01",
+  "schemaRevision": "20261126_04",
   "rowCounts": {
     "audit_logs": 0,
     "command_receipts": 0,
@@ -12,7 +12,7 @@
     "stock_movements": 0,
     "users": 5,
     "warehouses": 0,
-    "access_sessions": 0,
+    "access_sessions": 1,
     "handover_confirmations": 0,
     "handover_receipts": 0,
     "inbound_requests": 0,

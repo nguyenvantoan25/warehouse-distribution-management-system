@@ -19,7 +19,7 @@ async function save() {
 }
 </script>
 <template>
-<div class="ops-page-heading"><div><h1>Tài khoản & phạm vi</h1><p>Gán rõ kho và tổ chức trước khi sử dụng dữ liệu thật. Không thay đổi mật khẩu hoặc vai trò tại đây.</p></div></div>
+<div class="ops-page-heading"><div><h1>Tài khoản & phạm vi</h1><p>Gán rõ kho và tổ chức trước khi sử dụng dữ liệu thật. Không thay đổi mật khẩu hoặc vai trò tại đây.</p></div><RouterLink class="ops-button secondary" to="/admin/warehouses">Thiết lập kho</RouterLink></div>
 <p v-if="error || catalogError" role="alert" class="ops-alert error">{{ error || catalogError }}</p><p v-if="notice" role="status" class="ops-alert">{{ notice }}</p>
 <div class="module-grid"><section class="ops-panel"><div class="ops-table-wrap"><table class="ops-table"><thead><tr><th>Tài khoản</th><th>Vai trò</th><th>Kho</th></tr></thead><tbody><tr v-for="a in accounts" :key="a.id"><td>{{ a.username }}</td><td>{{ a.role }}</td><td>{{ a.warehouseName || 'Chưa gán' }}</td></tr></tbody></table></div></section>
 <form class="ops-panel module-form" @submit.prevent="save"><h2>Gán phạm vi truy cập</h2>

@@ -1,0 +1,2658 @@
+{
+  "observedAt": "2026-11-26T04:04:07.850583+00:00",
+  "database": "postgresql",
+  "schema": "public",
+  "revision": "20261126_04",
+  "tables": [
+    {
+      "name": "access_sessions",
+      "columns": [
+        {
+          "name": "token_hash",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "user_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "csrf_token",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "expires_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "token_hash"
+        ],
+        "name": "access_sessions_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "access_sessions_user_id_fkey",
+          "constrained_columns": [
+            "user_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "users",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_access_sessions_user_id",
+          "unique": false,
+          "column_names": [
+            "user_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "alembic_version",
+      "columns": [
+        {
+          "name": "version_num",
+          "type": "VARCHAR(32)",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "version_num"
+        ],
+        "name": "alembic_version_pkc",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": []
+    },
+    {
+      "name": "audit_logs",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "actor_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "object_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "action",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "before",
+          "type": "JSON",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "after",
+          "type": "JSON",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "audit_logs_pkey",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_audit_logs_actor_id",
+          "unique": false,
+          "column_names": [
+            "actor_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "ix_audit_logs_object_id",
+          "unique": false,
+          "column_names": [
+            "object_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "balance_locations",
+      "columns": [
+        {
+          "name": "balance_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "location_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "balance_id"
+        ],
+        "name": "balance_locations_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "balance_locations_balance_id_fkey",
+          "constrained_columns": [
+            "balance_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "inventory_balances",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "balance_locations_location_id_fkey",
+          "constrained_columns": [
+            "location_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "storage_locations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": []
+    },
+    {
+      "name": "command_receipts",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "actor_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "key",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "fingerprint",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "response",
+          "type": "JSON",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "command_receipts_pkey",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "actor_id",
+            "key"
+          ],
+          "name": "uq_command_actor_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_command_receipts_actor_id",
+          "unique": false,
+          "column_names": [
+            "actor_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "uq_command_actor_key",
+          "unique": true,
+          "column_names": [
+            "actor_id",
+            "key"
+          ],
+          "duplicates_constraint": "uq_command_actor_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "handover_confirmations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "side",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "actor_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "handover_confirmations_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "handover_confirmations_task_id_fkey",
+          "constrained_columns": [
+            "task_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "pickup_tasks",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "task_id",
+            "side",
+            "version"
+          ],
+          "name": "uq_confirmation_version",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "uq_confirmation_version",
+          "unique": true,
+          "column_names": [
+            "task_id",
+            "side",
+            "version"
+          ],
+          "duplicates_constraint": "uq_confirmation_version",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "handover_receipts",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "number",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "issued_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "handover_receipts_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "handover_receipts_task_id_fkey",
+          "constrained_columns": [
+            "task_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "pickup_tasks",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "number"
+          ],
+          "name": "handover_receipts_number_key",
+          "comment": null
+        },
+        {
+          "column_names": [
+            "task_id"
+          ],
+          "name": "handover_receipts_task_id_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "handover_receipts_number_key",
+          "unique": true,
+          "column_names": [
+            "number"
+          ],
+          "duplicates_constraint": "handover_receipts_number_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "handover_receipts_task_id_key",
+          "unique": true,
+          "column_names": [
+            "task_id"
+          ],
+          "duplicates_constraint": "handover_receipts_task_id_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "idempotency_requests",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "actor_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "key",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "response_status",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "idempotency_requests_pkey",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "actor_id",
+            "key"
+          ],
+          "name": "uq_actor_idempotency",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "uq_actor_idempotency",
+          "unique": true,
+          "column_names": [
+            "actor_id",
+            "key"
+          ],
+          "duplicates_constraint": "uq_actor_idempotency",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "inbound_lines",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "request_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "sku_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "good",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quarantined",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "inbound_lines_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "inbound_lines_request_id_fkey",
+          "constrained_columns": [
+            "request_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "inbound_requests",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "inbound_lines_sku_id_fkey",
+          "constrained_columns": [
+            "sku_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "skus",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_inbound_lines_request_id",
+          "unique": false,
+          "column_names": [
+            "request_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "inbound_postings",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "line_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "balance_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quarantined",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "inbound_postings_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "inbound_postings_balance_id_fkey",
+          "constrained_columns": [
+            "balance_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "inventory_balances",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "inbound_postings_line_id_fkey",
+          "constrained_columns": [
+            "line_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "inbound_lines",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "line_id"
+          ],
+          "name": "inbound_postings_line_id_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "inbound_postings_line_id_key",
+          "unique": true,
+          "column_names": [
+            "line_id"
+          ],
+          "duplicates_constraint": "inbound_postings_line_id_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "inbound_requests",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "supplier_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "warehouse_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "note",
+          "type": "TEXT",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "inbound_requests_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "inbound_requests_owner_id_fkey",
+          "constrained_columns": [
+            "owner_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "organizations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "inbound_requests_supplier_id_fkey",
+          "constrained_columns": [
+            "supplier_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "organizations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "inbound_requests_warehouse_id_fkey",
+          "constrained_columns": [
+            "warehouse_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "warehouses",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "code"
+          ],
+          "name": "inbound_requests_code_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "inbound_requests_code_key",
+          "unique": true,
+          "column_names": [
+            "code"
+          ],
+          "duplicates_constraint": "inbound_requests_code_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "ix_inbound_requests_owner_id",
+          "unique": false,
+          "column_names": [
+            "owner_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "ix_inbound_requests_supplier_id",
+          "unique": false,
+          "column_names": [
+            "supplier_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "inventory_balances",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "sku_code",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "warehouse_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "on_hand",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "reserved",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "unavailable",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "inventory_balances_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "inventory_balances_owner_id_fkey",
+          "constrained_columns": [
+            "owner_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "organizations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "inventory_balances_sku_code_fkey",
+          "constrained_columns": [
+            "sku_code"
+          ],
+          "referred_schema": "public",
+          "referred_table": "skus",
+          "referred_columns": [
+            "code"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "inventory_balances_warehouse_id_fkey",
+          "constrained_columns": [
+            "warehouse_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "warehouses",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [],
+      "checkConstraints": [
+        {
+          "name": "ck_stock_nonnegative",
+          "sqltext": "on_hand >= (reserved + unavailable) AND reserved >= 0 AND unavailable >= 0",
+          "comment": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_inventory_balances_owner_id",
+          "unique": false,
+          "column_names": [
+            "owner_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "inventory_postings",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "reservation_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "balance_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "inventory_postings_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "inventory_postings_balance_id_fkey",
+          "constrained_columns": [
+            "balance_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "inventory_balances",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "inventory_postings_reservation_id_fkey",
+          "constrained_columns": [
+            "reservation_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "stock_reservations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "inventory_postings_task_id_fkey",
+          "constrained_columns": [
+            "task_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "pickup_tasks",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "reservation_id"
+          ],
+          "name": "inventory_postings_reservation_id_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "inventory_postings_reservation_id_key",
+          "unique": true,
+          "column_names": [
+            "reservation_id"
+          ],
+          "duplicates_constraint": "inventory_postings_reservation_id_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "ix_inventory_postings_balance_id",
+          "unique": false,
+          "column_names": [
+            "balance_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "ix_inventory_postings_task_id",
+          "unique": false,
+          "column_names": [
+            "task_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "organizations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "active",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "supplied_goods",
+          "type": "VARCHAR(1000)",
+          "nullable": true,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "organizations_pkey",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": []
+    },
+    {
+      "name": "outbound_allocations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "line_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "balance_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "state",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "outbound_allocations_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "outbound_allocations_balance_id_fkey",
+          "constrained_columns": [
+            "balance_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "inventory_balances",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "outbound_allocations_line_id_fkey",
+          "constrained_columns": [
+            "line_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "outbound_lines",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_outbound_allocations_line_id",
+          "unique": false,
+          "column_names": [
+            "line_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "outbound_lines",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "request_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "sku_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "outbound_lines_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "outbound_lines_request_id_fkey",
+          "constrained_columns": [
+            "request_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "outbound_requests",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "outbound_lines_sku_id_fkey",
+          "constrained_columns": [
+            "sku_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "skus",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_outbound_lines_request_id",
+          "unique": false,
+          "column_names": [
+            "request_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "outbound_requests",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "warehouse_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "shipper_mode",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "shipper_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "created_at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "outbound_requests_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "outbound_requests_owner_id_fkey",
+          "constrained_columns": [
+            "owner_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "organizations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "outbound_requests_warehouse_id_fkey",
+          "constrained_columns": [
+            "warehouse_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "warehouses",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "code"
+          ],
+          "name": "outbound_requests_code_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_outbound_requests_owner_id",
+          "unique": false,
+          "column_names": [
+            "owner_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "outbound_requests_code_key",
+          "unique": true,
+          "column_names": [
+            "code"
+          ],
+          "duplicates_constraint": "outbound_requests_code_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "outbound_tasks",
+      "columns": [
+        {
+          "name": "request_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "request_id"
+        ],
+        "name": "outbound_tasks_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "outbound_tasks_request_id_fkey",
+          "constrained_columns": [
+            "request_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "outbound_requests",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "outbound_tasks_task_id_fkey",
+          "constrained_columns": [
+            "task_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "pickup_tasks",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "task_id"
+          ],
+          "name": "outbound_tasks_task_id_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "outbound_tasks_task_id_key",
+          "unique": true,
+          "column_names": [
+            "task_id"
+          ],
+          "duplicates_constraint": "outbound_tasks_task_id_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "package_items",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "package_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "line_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "package_items_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "package_items_line_id_fkey",
+          "constrained_columns": [
+            "line_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "outbound_lines",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "package_items_package_id_fkey",
+          "constrained_columns": [
+            "package_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "packages",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "package_id",
+            "line_id"
+          ],
+          "name": "package_items_package_id_line_id_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_package_items_package_id",
+          "unique": false,
+          "column_names": [
+            "package_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "package_items_package_id_line_id_key",
+          "unique": true,
+          "column_names": [
+            "package_id",
+            "line_id"
+          ],
+          "duplicates_constraint": "package_items_package_id_line_id_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "package_scans",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "package_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "package_scans_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "package_scans_package_id_fkey",
+          "constrained_columns": [
+            "package_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "packages",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "package_scans_task_id_fkey",
+          "constrained_columns": [
+            "task_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "pickup_tasks",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "task_id",
+            "package_id"
+          ],
+          "name": "uq_task_package_scan",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "uq_task_package_scan",
+          "unique": true,
+          "column_names": [
+            "task_id",
+            "package_id"
+          ],
+          "duplicates_constraint": "uq_task_package_scan",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "packages",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "packages_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "packages_task_id_fkey",
+          "constrained_columns": [
+            "task_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "pickup_tasks",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "code"
+          ],
+          "name": "packages_code_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_packages_task_id",
+          "unique": false,
+          "column_names": [
+            "task_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "packages_code_key",
+          "unique": true,
+          "column_names": [
+            "code"
+          ],
+          "duplicates_constraint": "packages_code_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "partner_memberships",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "organization_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "user_id",
+          "organization_id"
+        ],
+        "name": "partner_memberships_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "partner_memberships_organization_id_fkey",
+          "constrained_columns": [
+            "organization_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "organizations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "partner_memberships_user_id_fkey",
+          "constrained_columns": [
+            "user_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "users",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [],
+      "checkConstraints": [],
+      "indexes": []
+    },
+    {
+      "name": "pickup_tasks",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "warehouse_name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "shipper_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "status",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "shipper_accepted",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "arrived_at_warehouse",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "pickup_tasks_pkey",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "code"
+          ],
+          "name": "pickup_tasks_code_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_pickup_tasks_shipper_id",
+          "unique": false,
+          "column_names": [
+            "shipper_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "pickup_tasks_code_key",
+          "unique": true,
+          "column_names": [
+            "code"
+          ],
+          "duplicates_constraint": "pickup_tasks_code_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "skus",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "base_unit",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "skus_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "skus_owner_id_fkey",
+          "constrained_columns": [
+            "owner_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "organizations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "code"
+          ],
+          "name": "skus_code_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "ix_skus_owner_id",
+          "unique": false,
+          "column_names": [
+            "owner_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "skus_code_key",
+          "unique": true,
+          "column_names": [
+            "code"
+          ],
+          "duplicates_constraint": "skus_code_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "stock_movements",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "source_task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "kind",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "at",
+          "type": "TIMESTAMP",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "stock_movements_pkey",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "source_task_id",
+            "kind"
+          ],
+          "name": "uq_stock_issue_per_task",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "uq_stock_issue_per_task",
+          "unique": true,
+          "column_names": [
+            "source_task_id",
+            "kind"
+          ],
+          "duplicates_constraint": "uq_stock_issue_per_task",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "stock_reservations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "task_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "balance_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "quantity",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "state",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "stock_reservations_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "stock_reservations_balance_id_fkey",
+          "constrained_columns": [
+            "balance_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "inventory_balances",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "stock_reservations_task_id_fkey",
+          "constrained_columns": [
+            "task_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "pickup_tasks",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "task_id",
+            "balance_id"
+          ],
+          "name": "stock_reservations_task_id_balance_id_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [
+        {
+          "name": "ck_reservation_positive",
+          "sqltext": "quantity > 0",
+          "comment": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "ix_stock_reservations_task_id",
+          "unique": false,
+          "column_names": [
+            "task_id"
+          ],
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "stock_reservations_task_id_balance_id_key",
+          "unique": true,
+          "column_names": [
+            "task_id",
+            "balance_id"
+          ],
+          "duplicates_constraint": "stock_reservations_task_id_balance_id_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "storage_locations",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "warehouse_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "code",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "rack_row",
+          "type": "INTEGER",
+          "nullable": true,
+          "serverDefault": null
+        },
+        {
+          "name": "rack_level",
+          "type": "INTEGER",
+          "nullable": true,
+          "serverDefault": null
+        },
+        {
+          "name": "rack_bay",
+          "type": "INTEGER",
+          "nullable": true,
+          "serverDefault": null
+        },
+        {
+          "name": "rack_depth",
+          "type": "INTEGER",
+          "nullable": true,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "storage_locations_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "storage_locations_warehouse_id_fkey",
+          "constrained_columns": [
+            "warehouse_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "warehouses",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "warehouse_id",
+            "code"
+          ],
+          "name": "storage_locations_warehouse_id_code_key",
+          "comment": null
+        },
+        {
+          "column_names": [
+            "warehouse_id",
+            "rack_row",
+            "rack_level",
+            "rack_bay",
+            "rack_depth"
+          ],
+          "name": "uq_storage_rack_coordinate",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [
+        {
+          "name": "ck_storage_rack_coordinate",
+          "sqltext": "rack_row IS NULL AND rack_level IS NULL AND rack_bay IS NULL AND rack_depth IS NULL OR rack_row IS NOT NULL AND rack_level IS NOT NULL AND rack_bay IS NOT NULL AND rack_depth IS NOT NULL AND rack_row >= 1 AND rack_row <= 8 AND rack_level >= 1 AND rack_level <= 10 AND rack_bay >= 1 AND rack_bay <= 10 AND rack_depth = 1",
+          "comment": null
+        }
+      ],
+      "indexes": [
+        {
+          "name": "storage_locations_warehouse_id_code_key",
+          "unique": true,
+          "column_names": [
+            "warehouse_id",
+            "code"
+          ],
+          "duplicates_constraint": "storage_locations_warehouse_id_code_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        },
+        {
+          "name": "uq_storage_rack_coordinate",
+          "unique": true,
+          "column_names": [
+            "warehouse_id",
+            "rack_row",
+            "rack_level",
+            "rack_bay",
+            "rack_depth"
+          ],
+          "duplicates_constraint": "uq_storage_rack_coordinate",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "supply_relationships",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "supplier_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "owner_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "sku_id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "supply_relationships_pkey",
+        "comment": null
+      },
+      "foreignKeys": [
+        {
+          "name": "supply_relationships_owner_id_fkey",
+          "constrained_columns": [
+            "owner_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "organizations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "supply_relationships_sku_id_fkey",
+          "constrained_columns": [
+            "sku_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "skus",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        },
+        {
+          "name": "supply_relationships_supplier_id_fkey",
+          "constrained_columns": [
+            "supplier_id"
+          ],
+          "referred_schema": "public",
+          "referred_table": "organizations",
+          "referred_columns": [
+            "id"
+          ],
+          "options": {},
+          "comment": null
+        }
+      ],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "supplier_id",
+            "owner_id",
+            "sku_id"
+          ],
+          "name": "supply_relationships_supplier_id_owner_id_sku_id_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "supply_relationships_supplier_id_owner_id_sku_id_key",
+          "unique": true,
+          "column_names": [
+            "supplier_id",
+            "owner_id",
+            "sku_id"
+          ],
+          "duplicates_constraint": "supply_relationships_supplier_id_owner_id_sku_id_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "users",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "username",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "password_hash",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "role",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "warehouse_scope",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "active",
+          "type": "BOOLEAN",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "display_name",
+          "type": "VARCHAR",
+          "nullable": true,
+          "serverDefault": null
+        },
+        {
+          "name": "deleted_at",
+          "type": "TIMESTAMP",
+          "nullable": true,
+          "serverDefault": null
+        },
+        {
+          "name": "version",
+          "type": "INTEGER",
+          "nullable": false,
+          "serverDefault": "1"
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "users_pkey",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "username"
+          ],
+          "name": "users_username_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "users_username_key",
+          "unique": true,
+          "column_names": [
+            "username"
+          ],
+          "duplicates_constraint": "users_username_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    },
+    {
+      "name": "warehouses",
+      "columns": [
+        {
+          "name": "id",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        },
+        {
+          "name": "name",
+          "type": "VARCHAR",
+          "nullable": false,
+          "serverDefault": null
+        }
+      ],
+      "primaryKey": {
+        "constrained_columns": [
+          "id"
+        ],
+        "name": "warehouses_pkey",
+        "comment": null
+      },
+      "foreignKeys": [],
+      "uniqueConstraints": [
+        {
+          "column_names": [
+            "name"
+          ],
+          "name": "warehouses_name_key",
+          "comment": null
+        }
+      ],
+      "checkConstraints": [],
+      "indexes": [
+        {
+          "name": "warehouses_name_key",
+          "unique": true,
+          "column_names": [
+            "name"
+          ],
+          "duplicates_constraint": "warehouses_name_key",
+          "include_columns": [],
+          "dialect_options": {
+            "postgresql_include": []
+          }
+        }
+      ]
+    }
+  ]
+}

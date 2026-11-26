@@ -17,6 +17,7 @@ Base.metadata.create_all(engine)
 with SessionLocal() as db:
     for username, role in [
         ("admin", "WAREHOUSE_ADMIN"),
+        ("dispatch", "DISPATCH_MANAGER"),
         ("supplier", "SUPPLIER"),
         ("retailer", "RETAILER_OWNER"),
         ("shipper", "SHIPPER"),

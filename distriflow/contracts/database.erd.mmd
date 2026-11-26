@@ -1,0 +1,254 @@
+erDiagram
+    users ||..o{ access_sessions : user_id
+    inventory_balances ||--o| balance_locations : balance_id
+    storage_locations ||..o{ balance_locations : location_id
+    pickup_tasks ||..o{ handover_confirmations : task_id
+    pickup_tasks ||..o| handover_receipts : task_id
+    inbound_requests ||..o{ inbound_lines : request_id
+    skus ||..o{ inbound_lines : sku_id
+    inventory_balances ||..o{ inbound_postings : balance_id
+    inbound_lines ||..o| inbound_postings : line_id
+    organizations ||..o{ inbound_requests : owner_id
+    organizations ||..o{ inbound_requests : supplier_id
+    warehouses ||..o{ inbound_requests : warehouse_id
+    organizations ||..o{ inventory_balances : owner_id
+    skus ||..o{ inventory_balances : sku_code
+    warehouses ||..o{ inventory_balances : warehouse_id
+    inventory_balances ||..o{ inventory_postings : balance_id
+    stock_reservations ||..o| inventory_postings : reservation_id
+    pickup_tasks ||..o{ inventory_postings : task_id
+    inventory_balances ||..o{ outbound_allocations : balance_id
+    outbound_lines ||..o{ outbound_allocations : line_id
+    outbound_requests ||..o{ outbound_lines : request_id
+    skus ||..o{ outbound_lines : sku_id
+    organizations ||..o{ outbound_requests : owner_id
+    warehouses ||..o{ outbound_requests : warehouse_id
+    outbound_requests ||--o| outbound_tasks : request_id
+    pickup_tasks ||..o| outbound_tasks : task_id
+    outbound_lines ||..o{ package_items : line_id
+    packages ||..o{ package_items : package_id
+    packages ||..o{ package_scans : package_id
+    pickup_tasks ||..o{ package_scans : task_id
+    pickup_tasks ||..o{ packages : task_id
+    organizations ||--o{ partner_memberships : organization_id
+    users ||--o{ partner_memberships : user_id
+    organizations ||..o{ skus : owner_id
+    inventory_balances ||..o{ stock_reservations : balance_id
+    pickup_tasks ||..o{ stock_reservations : task_id
+    warehouses ||..o{ storage_locations : warehouse_id
+    organizations ||..o{ supply_relationships : owner_id
+    skus ||..o{ supply_relationships : sku_id
+    organizations ||..o{ supply_relationships : supplier_id
+    access_sessions {
+        varchar token_hash PK
+        varchar user_id FK
+        varchar csrf_token
+        timestamp expires_at
+    }
+    alembic_version {
+        varchar_32 version_num PK
+    }
+    audit_logs {
+        varchar id PK
+        varchar actor_id
+        varchar object_id
+        varchar action
+        json before
+        json after
+        timestamp at
+    }
+    balance_locations {
+        varchar balance_id PK, FK
+        varchar location_id FK
+    }
+    command_receipts {
+        varchar id PK
+        varchar actor_id
+        varchar key
+        varchar fingerprint
+        json response
+        timestamp at
+    }
+    handover_confirmations {
+        varchar id PK
+        varchar task_id FK
+        varchar side
+        integer version
+        varchar actor_id
+        timestamp at
+    }
+    handover_receipts {
+        varchar id PK
+        varchar task_id FK, UK
+        varchar number UK
+        timestamp issued_at
+    }
+    idempotency_requests {
+        varchar id PK
+        varchar actor_id
+        varchar key
+        varchar task_id
+        varchar response_status
+    }
+    inbound_lines {
+        varchar id PK
+        varchar request_id FK
+        varchar sku_id FK
+        integer quantity
+        integer good
+        integer quarantined
+    }
+    inbound_postings {
+        varchar id PK
+        varchar line_id FK, UK
+        varchar balance_id FK
+        integer quantity
+        integer quarantined
+        timestamp at
+    }
+    inbound_requests {
+        varchar id PK
+        varchar code UK
+        varchar supplier_id FK
+        varchar owner_id FK
+        varchar warehouse_id FK
+        varchar status
+        integer version
+        text note
+        timestamp created_at
+    }
+    inventory_balances {
+        varchar id PK
+        varchar owner_id FK
+        varchar sku_code FK
+        varchar warehouse_id FK
+        integer on_hand
+        integer reserved
+        integer unavailable
+    }
+    inventory_postings {
+        varchar id PK
+        varchar reservation_id FK, UK
+        varchar balance_id FK
+        varchar task_id FK
+        integer quantity
+        varchar kind
+        timestamp at
+    }
+    organizations {
+        varchar id PK
+        varchar name
+        varchar kind
+        boolean active
+        varchar_1000 supplied_goods
+    }
+    outbound_allocations {
+        varchar id PK
+        varchar line_id FK
+        varchar balance_id FK
+        integer quantity
+        varchar state
+    }
+    outbound_lines {
+        varchar id PK
+        varchar request_id FK
+        varchar sku_id FK
+        integer quantity
+    }
+    outbound_requests {
+        varchar id PK
+        varchar code UK
+        varchar owner_id FK
+        varchar warehouse_id FK
+        varchar shipper_mode
+        varchar shipper_id
+        varchar status
+        integer version
+        timestamp created_at
+    }
+    outbound_tasks {
+        varchar request_id PK, FK
+        varchar task_id FK, UK
+    }
+    package_items {
+        varchar id PK
+        varchar package_id FK
+        varchar line_id FK
+        integer quantity
+    }
+    package_scans {
+        varchar id PK
+        varchar task_id FK
+        varchar package_id FK
+        timestamp at
+    }
+    packages {
+        varchar id PK
+        varchar task_id FK
+        varchar code UK
+    }
+    partner_memberships {
+        varchar user_id PK, FK
+        varchar organization_id PK, FK
+    }
+    pickup_tasks {
+        varchar id PK
+        varchar code UK
+        varchar warehouse_name
+        varchar shipper_id
+        varchar status
+        integer version
+        boolean shipper_accepted
+        boolean arrived_at_warehouse
+    }
+    skus {
+        varchar id PK
+        varchar code UK
+        varchar name
+        varchar base_unit
+        varchar owner_id FK
+    }
+    stock_movements {
+        varchar id PK
+        varchar source_task_id
+        varchar kind
+        integer quantity
+        timestamp at
+    }
+    stock_reservations {
+        varchar id PK
+        varchar task_id FK
+        varchar balance_id FK
+        integer quantity
+        varchar state
+    }
+    storage_locations {
+        varchar id PK
+        varchar warehouse_id FK
+        varchar code
+        integer rack_row
+        integer rack_level
+        integer rack_bay
+        integer rack_depth
+    }
+    supply_relationships {
+        varchar id PK
+        varchar supplier_id FK
+        varchar owner_id FK
+        varchar sku_id FK
+    }
+    users {
+        varchar id PK
+        varchar username UK
+        varchar password_hash
+        varchar role
+        varchar warehouse_scope
+        boolean active
+        varchar display_name
+        timestamp deleted_at
+        integer version
+    }
+    warehouses {
+        varchar id PK
+        varchar name UK
+    }

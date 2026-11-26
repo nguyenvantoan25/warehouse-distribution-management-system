@@ -38,7 +38,7 @@
 .ops-sidebar-user-menu{position:relative;color:#94a3b8}
 .ops-sidebar-user-menu summary{cursor:pointer;list-style:none}
 .ops-sidebar-user-menu button{position:absolute;left:-140px;bottom:28px;width:170px;display:flex;align-items:center;gap:8px;box-shadow:0 6px 25px #0f172a15;border:1px solid #e2e8f0;border-radius:8px;background:white;color:#334155;font-size:12px;padding:12px}
-.ops-workspace{margin-left:248px;width:calc(100% - 248px);min-height:100vh}
+.ops-workspace{margin-left:248px;width:calc(100% - 248px);min-width:0;min-height:100vh}
 .ops-topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;height:72px;border-bottom:1px solid #dbeafe;background:#ffffffcc;backdrop-filter:blur(24px);box-shadow:0 4px 24px #2563eb0a;padding:0 28px}
 .ops-header-title p{font-size:11px;color:#94a3b8}.ops-header-title p span{padding:0 4px}
 .ops-header-title h1{font-size:18px;font-weight:700;letter-spacing:-.025em;line-height:28px;margin-top:2px}

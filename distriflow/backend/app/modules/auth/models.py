@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -14,6 +14,10 @@ class User(Base):
     role: Mapped[str] = mapped_column(String)
     warehouse_scope: Mapped[str] = mapped_column(String)
     active: Mapped[bool] = mapped_column(Boolean, default=True)
+    display_name: Mapped[str | None] = mapped_column(String, nullable=True)
+    deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
+    version: Mapped[int] = mapped_column(Integer, default=1, server_default=text("1"))
+    __mapper_args__ = {"version_id_col": version}
 
 
 class AccessSession(Base):

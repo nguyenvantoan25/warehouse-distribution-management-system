@@ -20,6 +20,18 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 @router.post("/login")
 def login(command: LoginCommand, response: Response, db: Session = Depends(get_db)):
     user, session, token = open_session(db, command)
+    return session_response(user, session, token, response)
+
+
+@router.post("/shipper-login")
+def shipper_login(
+    command: LoginCommand, response: Response, db: Session = Depends(get_db)
+):
+    user, session, token = open_session(db, command, required_role="SHIPPER")
+    return session_response(user, session, token, response)
+
+
+def session_response(user, session, token, response):
     response.set_cookie(
         COOKIE_NAME,
         token,

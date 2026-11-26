@@ -76,7 +76,7 @@ def current_user(request: Request, db: Session = Depends(get_db)) -> User:
     if not session or session.expires_at <= utcnow():
         raise HTTPException(401, "Phiên đăng nhập đã hết hạn hoặc chưa đăng nhập")
     user = db.get(User, session.user_id)
-    if not user or not user.active:
+    if not user or not user.active or user.deleted_at is not None:
         raise HTTPException(401, "Tài khoản không còn hoạt động")
     if request.method not in {"GET", "HEAD", "OPTIONS"}:
         if not secrets.compare_digest(

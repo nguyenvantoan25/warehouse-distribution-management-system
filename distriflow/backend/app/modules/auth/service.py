@@ -19,14 +19,17 @@ def profile(user: User, session: AccessSession):
     }
 
 
-def open_session(db, command):
+def open_session(db, command, required_role=None):
     user = db.scalar(select(User).where(User.username == command.username))
     if (
         not user
         or not user.active
+        or user.deleted_at is not None
         or not verify_password(command.password, user.password_hash)
     ):
         raise HTTPException(401, "Tên đăng nhập hoặc mật khẩu không đúng")
+    if required_role and user.role != required_role:
+        raise HTTPException(403, "Ứng dụng này chỉ dành cho tài khoản shipper")
     token = secrets.token_urlsafe(48)
     session = AccessSession(
         token_hash=token_hash(token),

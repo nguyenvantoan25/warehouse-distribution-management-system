@@ -10,5 +10,5 @@ export function useCatalog() {
     finally { loading.value = false }
   }
   onMounted(load)
-  return { partners, skus, warehouses, locations, supplies, owners: computed(() => partners.value.filter(p => p.kind === 'RETAILER')), suppliers: computed(() => partners.value.filter(p => p.kind === 'SUPPLIER')), loading, error, load }
+  return { partners, skus, warehouses, locations, supplies, owners: computed(() => partners.value.filter(p => p.kind === 'RETAILER' && p.active)), suppliers: computed(() => partners.value.filter(p => p.kind === 'SUPPLIER')), loading, error, load }
 }

@@ -44,6 +44,45 @@
         }
       }
     },
+    "/api/v1/auth/shipper-login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Shipper Login",
+        "operationId": "shipper_login_api_v1_auth_shipper_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginCommand"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/me": {
       "get": {
         "tags": [
@@ -136,6 +175,212 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/ScopeCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/directory": {
+      "get": {
+        "tags": [
+          "account-partner-directory"
+        ],
+        "summary": "List Directory",
+        "operationId": "list_directory_api_v1_directory_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "account-partner-directory"
+        ],
+        "summary": "Create Account",
+        "operationId": "create_account_api_v1_directory_post",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAccount"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/directory/{user_id}/update": {
+      "post": {
+        "tags": [
+          "account-partner-directory"
+        ],
+        "summary": "Update Account",
+        "operationId": "update_account_api_v1_directory__user_id__update_post",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAccount"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/directory/{user_id}/delete": {
+      "post": {
+        "tags": [
+          "account-partner-directory"
+        ],
+        "summary": "Delete Account",
+        "operationId": "delete_account_api_v1_directory__user_id__delete_post",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "User Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteAccount"
               }
             }
           }
@@ -559,6 +804,82 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/HoldCommand"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/rack-map": {
+      "get": {
+        "tags": [
+          "warehouse-racks"
+        ],
+        "summary": "Read Map",
+        "operationId": "read_map_api_v1_inventory_rack_map_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/inventory/rack-map/initialize": {
+      "post": {
+        "tags": [
+          "warehouse-racks"
+        ],
+        "summary": "Initialize",
+        "operationId": "initialize_api_v1_inventory_rack_map_initialize_post",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RackInitializeCommand"
               }
             }
           }
@@ -1848,7 +2169,7 @@
         "properties": {
           "version": {
             "type": "integer",
-            "minimum": 1.0,
+            "minimum": 1,
             "title": "Version"
           },
           "shipper_id": {
@@ -1864,6 +2185,85 @@
           "shipper_id"
         ],
         "title": "AssignCommand"
+      },
+      "CreateAccount": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 3,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "title": "Username"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "supplied_goods": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplied Goods"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "SHIPPER",
+              "SUPPLIER",
+              "RETAILER_OWNER"
+            ],
+            "title": "Role"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "title": "Password",
+            "writeOnly": true
+          },
+          "organization_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organization Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "username",
+          "name",
+          "role",
+          "password"
+        ],
+        "title": "CreateAccount"
+      },
+      "DeleteAccount": {
+        "properties": {
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Version"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "version"
+        ],
+        "title": "DeleteAccount"
       },
       "HTTPValidationError": {
         "properties": {
@@ -1886,7 +2286,7 @@
           },
           "quantity": {
             "type": "integer",
-            "exclusiveMinimum": 0.0,
+            "exclusiveMinimum": 0,
             "title": "Quantity"
           },
           "release": {
@@ -2030,13 +2430,13 @@
         "properties": {
           "version": {
             "type": "integer",
-            "minimum": 1.0,
+            "minimum": 1,
             "title": "Version"
           },
           "package_count": {
             "type": "integer",
-            "maximum": 100.0,
-            "minimum": 1.0,
+            "maximum": 100,
+            "minimum": 1,
             "title": "Package Count"
           }
         },
@@ -2075,7 +2475,7 @@
         "properties": {
           "version": {
             "type": "integer",
-            "minimum": 1.0,
+            "minimum": 1,
             "title": "Version"
           },
           "location_id": {
@@ -2090,11 +2490,32 @@
         ],
         "title": "PutawayCommand"
       },
+      "RackInitializeCommand": {
+        "properties": {
+          "warehouse_id": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Warehouse Id"
+          },
+          "total_positions": {
+            "type": "integer",
+            "const": 800,
+            "title": "Total Positions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "warehouse_id",
+          "total_positions"
+        ],
+        "title": "RackInitializeCommand"
+      },
       "ReceiveCommand": {
         "properties": {
           "version": {
             "type": "integer",
-            "minimum": 1.0,
+            "minimum": 1,
             "title": "Version"
           },
           "lines": {
@@ -2128,12 +2549,12 @@
           },
           "good": {
             "type": "integer",
-            "minimum": 0.0,
+            "minimum": 0,
             "title": "Good"
           },
           "quarantined": {
             "type": "integer",
-            "minimum": 0.0,
+            "minimum": 0,
             "title": "Quarantined"
           }
         },
@@ -2153,8 +2574,8 @@
           },
           "quantity": {
             "type": "integer",
-            "maximum": 10000000.0,
-            "exclusiveMinimum": 0.0,
+            "maximum": 10000000,
+            "exclusiveMinimum": 0,
             "title": "Quantity"
           }
         },
@@ -2169,7 +2590,7 @@
         "properties": {
           "version": {
             "type": "integer",
-            "minimum": 1.0,
+            "minimum": 1,
             "title": "Version"
           },
           "accepted": {
@@ -2188,7 +2609,7 @@
         "properties": {
           "version": {
             "type": "integer",
-            "minimum": 1.0,
+            "minimum": 1,
             "title": "Version"
           },
           "accepted": {
@@ -2213,7 +2634,7 @@
         "properties": {
           "version": {
             "type": "integer",
-            "minimum": 1.0,
+            "minimum": 1,
             "title": "Version"
           },
           "package_code": {
@@ -2391,6 +2812,61 @@
         ],
         "title": "TaskDto"
       },
+      "UpdateAccount": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 3,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "title": "Username"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 150,
+            "minLength": 2,
+            "title": "Name"
+          },
+          "supplied_goods": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 1000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supplied Goods"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "title": "Version"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "password",
+                "writeOnly": true
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Password"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "username",
+          "name",
+          "version"
+        ],
+        "title": "UpdateAccount"
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -2435,7 +2911,7 @@
         "properties": {
           "version": {
             "type": "integer",
-            "minimum": 1.0,
+            "minimum": 1,
             "title": "Version"
           }
         },

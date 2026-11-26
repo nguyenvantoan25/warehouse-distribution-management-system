@@ -4,15 +4,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.exceptions import HTTPException
 from uuid import uuid4
-from app.modules.auth.router import router as auth_router
-from app.modules.auth.scopes import router as account_scopes_router
-from app.modules.handover.router import router as handover_router
-from app.modules.platform.router import router as platform_router
-from app.modules.dispatch.router import router as dispatch_router
-from app.modules.inventory.router import router as inventory_router
-from app.modules.catalog.router import router as catalog_router
-from app.modules.inbound.router import router as inbound_router
-from app.modules.outbound.router import router as outbound_router
+from app.api.router import router as api_router
 from fastapi import Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -27,15 +19,7 @@ app.add_middleware(
     allow_methods=["GET", "POST"],
     allow_headers=["Content-Type", "Idempotency-Key", "X-CSRF-Token"],
 )
-app.include_router(auth_router, prefix="/api/v1")
-app.include_router(account_scopes_router, prefix="/api/v1")
-app.include_router(platform_router, prefix="/api/v1")
-app.include_router(dispatch_router, prefix="/api/v1")
-app.include_router(inventory_router, prefix="/api/v1")
-app.include_router(catalog_router, prefix="/api/v1")
-app.include_router(inbound_router, prefix="/api/v1")
-app.include_router(outbound_router, prefix="/api/v1")
-app.include_router(handover_router, prefix="/api/v1")
+app.include_router(api_router)
 
 
 @app.exception_handler(HTTPException)

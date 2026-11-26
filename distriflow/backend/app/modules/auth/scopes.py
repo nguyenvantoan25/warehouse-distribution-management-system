@@ -38,6 +38,7 @@ def accounts(
     users = db.scalars(
         select(User)
         .where(
+            User.deleted_at.is_(None),
             or_(
                 User.warehouse_scope == actor.warehouse_scope,
                 User.warehouse_scope == "",
@@ -60,6 +61,7 @@ def scope(
         select(User)
         .where(
             User.id == user_id,
+            User.deleted_at.is_(None),
             or_(
                 User.warehouse_scope == actor.warehouse_scope,
                 User.warehouse_scope == "",
